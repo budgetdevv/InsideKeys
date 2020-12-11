@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace InsideKeys
 {
@@ -10,14 +10,16 @@ namespace InsideKeys
             private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
             private readonly Dictionary<char, int> CharToIndex;
-            
-            private readonly ConcurrentQueue<Random> Rands;
+
+            private readonly ThreadLocal<Random> Rands;
         
             public InsideKeys()
             {
                 CharToIndex = new Dictionary<char, int>();
                 
-                Rands = new ConcurrentQueue<Random>();
+                //This is so that results wouldn't always be the same upon restart
+                
+                Rands = new ThreadLocal<Random>(() => new Random((int)DateTime.UtcNow.Ticks));
 
                 for (int I = 0; I <= 9; I++)
                 {
@@ -30,7 +32,7 @@ namespace InsideKeys
             {
                 //Memory is Zero-ed
                 
-                var KeyNums = stackalloc int[21];
+                var KeyNums = stackalloc int[13];
 
                 var KeyChars = stackalloc char[25];
         
@@ -55,31 +57,37 @@ namespace InsideKeys
                 int Total = (Date.Year * 1_0000) + (Date.Month * 100) + (Date.Day);
         
                 //Generate first 8 letters
-        
-                if (!Rands.TryDequeue(out var Rand))
-                {
-                    Rand = new Random();
-                }
+
+                var Rand = Rands.Value;
                 
                 int Offset = 0;
                 
-                for (int I = 0; I < 8; I++)
+                for (int I = 0; I < 4; I++)
                 {
-                    int RandNum = Rand.Next(0, Chars.Length);
-                    
-                    KeyNums[I] = RandNum; ;
+                    char NewChar = Chars[Rand.Next(0, Chars.Length)];
 
-                    Offset += Chars[RandNum];
+                    KeyChars[I] = NewChar;
+
+                    Offset += NewChar;
                 }
-        
-                Rands.Enqueue(Rand);
+                
+                //Skip Dash
+                
+                for (int I = 5; I < 9; I++)
+                {
+                    char NewChar = Chars[Rand.Next(0, Chars.Length)];
+
+                    KeyChars[I] = NewChar;
+
+                    Offset += NewChar;
+                }
 
                 Total -= Offset;
 
                 //Generate 8 chars based on Total; Total is guaranteed to be 8 digits
                 //E.x. 2001-11-21, and max value of offset is below 1k
 
-                SplitFast(Total, ref KeyNums, 16);
+                SplitFast(Total, ref KeyNums, 8);
 
                 //Generate remaining 5 digits based on Secs elapsed in the day
         
@@ -87,11 +95,13 @@ namespace InsideKeys
 
                 int TotalSeconds = (int)DateTime.UtcNow.TimeOfDay.TotalSeconds;
 
-                SplitFast(TotalSeconds, ref KeyNums, 21);
+                SplitFast(TotalSeconds, ref KeyNums, 13);
 
                 int AccessCount = 0;
 
-                for (int I = 0; I < 25; I++)
+                //Skip first 9 chars since they are already generated ( Inclusive of dash )
+                
+                for (int I = 9; I < 25; I++)
                 {
                     if (KeyChars[I] == '-')
                     {
