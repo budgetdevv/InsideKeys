@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace InsideKeys
 {
-    public class InsideKeys
+    public class InsideKeyEngine
         {
             private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
@@ -13,7 +13,7 @@ namespace InsideKeys
 
             private readonly ThreadLocal<Random> Rands;
         
-            public InsideKeys()
+            public InsideKeyEngine()
             {
                 CharToIndex = new Dictionary<char, int>();
                 
@@ -28,7 +28,7 @@ namespace InsideKeys
             }
         
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public unsafe string GenCode()
+            public unsafe string GenCode(TimeSpan LifeTime)
             {
                 //Memory is Zero-ed
                 
@@ -36,7 +36,7 @@ namespace InsideKeys
 
                 var KeyChars = stackalloc char[25];
         
-                var Dash = '-';
+                const char Dash = '-';
         
                 KeyChars[4] = Dash;
                 
@@ -49,12 +49,12 @@ namespace InsideKeys
                 //Year-Month-Day-Seconds -> 2001-11-21-86400
             
                 //Product Key -> XXXX-XXXX-2001-1121-86400
-        
-                var Date = DateTime.UtcNow;
+
+                var ExpiryDate = DateTime.UtcNow + LifeTime;
         
                 //Year first since Year is guaranteed to be 2020 + ( We can't go back in time... )
                 
-                int Total = (Date.Year * 1_0000) + (Date.Month * 100) + (Date.Day);
+                int Total = (ExpiryDate.Year * 1_0000) + (ExpiryDate.Month * 100) + (ExpiryDate.Day);
         
                 //Generate first 8 letters
 
@@ -93,7 +93,10 @@ namespace InsideKeys
         
                 //Ranges anywhere from 0 to 86400 - 1
 
-                int TotalSeconds = (int)DateTime.UtcNow.TimeOfDay.TotalSeconds;
+                
+                //int TotalSeconds = (int)DateTime.UtcNow.TimeOfDay.TotalSeconds; //Me being retarded
+                
+                int TotalSeconds = (int)ExpiryDate.TimeOfDay.TotalSeconds;
 
                 SplitFast(TotalSeconds, ref KeyNums, 13);
 
@@ -174,7 +177,7 @@ namespace InsideKeys
                 
                 Total += Offset;
                 
-                Console.WriteLine(Total);
+                //Console.WriteLine(Total);
                 
                 //At this point, it looks like this -> 2001-11-21 ( Without the dashes of course )
                 
@@ -209,7 +212,7 @@ namespace InsideKeys
 
                 int Seconds = CombineFast(ref TimeInts, 0, 5);
 
-                Console.WriteLine(Seconds);
+                //Console.WriteLine(Seconds);
                 
                 var DT = new DateTime(Year, Month, Day);
 
@@ -217,7 +220,7 @@ namespace InsideKeys
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private unsafe int SplitFast(int Num, ref int* Output, int ArrayLength)
+            private static unsafe int SplitFast(int Num, ref int* Output, int ArrayLength)
             {
                 int I = 1;
                 
@@ -241,7 +244,7 @@ namespace InsideKeys
             }
             
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private unsafe int CombineFast(ref int* Input, int StartingIndex, int ArrayLength)
+            private static unsafe int CombineFast(ref int* Input, int StartingIndex, int ArrayLength)
             {
                 int F = 0;
 
@@ -261,7 +264,7 @@ namespace InsideKeys
             }
             
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private int PowFast(int Num, int Exp)
+            private static int PowFast(int Num, int Exp)
             {
                 int result = 1;
                 
