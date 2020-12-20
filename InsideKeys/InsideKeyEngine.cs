@@ -82,7 +82,17 @@ namespace InsideKeys
                     Offset += NewChar;
                 }
 
-                Total -= Offset;
+                // //Offset MM/DD
+                //
+                // Total -= Offset;
+                //
+                // //Offset YYYY
+                //
+                // Total -= Offset * 1000;
+                
+                //Offset YYYY/MM/DD
+                
+                Total -= Offset * 1001;
 
                 //Generate 8 chars based on Total; Total is guaranteed to be 8 digits
                 //E.x. 2001-11-21, and max value of offset is below 1k
@@ -173,11 +183,15 @@ namespace InsideKeys
 
                 var Total = CombineFast(ref TimeInts, 0, 8);
 
-                //Increment Total by Offset to get YYYY/MM/DD
-                
-                Total += Offset;
+                // //Increment Total by Offset to get YYYY/MM/DD
+                //
+                // Total += Offset;
                 
                 //Console.WriteLine(Total);
+
+                Total += Offset * 1001;
+                
+                //Increment Total by Offset to get YYYY/MM/DD
                 
                 //At this point, it looks like this -> 2001-11-21 ( Without the dashes of course )
                 
