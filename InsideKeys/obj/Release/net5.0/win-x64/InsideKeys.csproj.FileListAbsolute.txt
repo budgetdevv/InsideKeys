@@ -1,0 +1,12 @@
+C:\Users\Administrator\Desktop\Code\InsideKeys\InsideKeys\bin\Release\net5.0\win-x64\InsideKeys.deps.json
+C:\Users\Administrator\Desktop\Code\InsideKeys\InsideKeys\bin\Release\net5.0\win-x64\InsideKeys.dll
+C:\Users\Administrator\Desktop\Code\InsideKeys\InsideKeys\bin\Release\net5.0\win-x64\ref\InsideKeys.dll
+C:\Users\Administrator\Desktop\Code\InsideKeys\InsideKeys\bin\Release\net5.0\win-x64\InsideKeys.pdb
+C:\Users\Administrator\Desktop\Code\InsideKeys\InsideKeys\obj\Release\net5.0\win-x64\InsideKeys.csprojAssemblyReference.cache
+C:\Users\Administrator\Desktop\Code\InsideKeys\InsideKeys\obj\Release\net5.0\win-x64\InsideKeys.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Administrator\Desktop\Code\InsideKeys\InsideKeys\obj\Release\net5.0\win-x64\InsideKeys.AssemblyInfoInputs.cache
+C:\Users\Administrator\Desktop\Code\InsideKeys\InsideKeys\obj\Release\net5.0\win-x64\InsideKeys.AssemblyInfo.cs
+C:\Users\Administrator\Desktop\Code\InsideKeys\InsideKeys\obj\Release\net5.0\win-x64\InsideKeys.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\Code\InsideKeys\InsideKeys\obj\Release\net5.0\win-x64\InsideKeys.dll
+C:\Users\Administrator\Desktop\Code\InsideKeys\InsideKeys\obj\Release\net5.0\win-x64\ref\InsideKeys.dll
+C:\Users\Administrator\Desktop\Code\InsideKeys\InsideKeys\obj\Release\net5.0\win-x64\InsideKeys.pdb

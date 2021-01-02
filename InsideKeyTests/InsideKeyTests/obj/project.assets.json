@@ -1,8 +1,7 @@
 {
   "version": 3,
   "targets": {
-    "net5.0": {},
-    "net5.0/win-x64": {}
+    "net5.0": {}
   },
   "libraries": {},
   "projectFileDependencyGroups": {
@@ -14,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Administrator\\Desktop\\Code\\InsideKeys\\InsideKeys\\InsideKeys.csproj",
-      "projectName": "InsideKeys",
-      "projectPath": "C:\\Users\\Administrator\\Desktop\\Code\\InsideKeys\\InsideKeys\\InsideKeys.csproj",
+      "projectUniqueName": "C:\\Users\\Administrator\\Desktop\\Code\\InsideKeyTests\\InsideKeyTests\\InsideKeyTests.csproj",
+      "projectName": "InsideKeyTests",
+      "projectPath": "C:\\Users\\Administrator\\Desktop\\Code\\InsideKeyTests\\InsideKeyTests\\InsideKeyTests.csproj",
       "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Administrator\\Desktop\\Code\\InsideKeys\\InsideKeys\\obj\\",
+      "outputPath": "C:\\Users\\Administrator\\Desktop\\Code\\InsideKeyTests\\InsideKeyTests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -61,11 +60,6 @@
           }
         },
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
-      }
-    },
-    "runtimes": {
-      "win-x64": {
-        "#import": []
       }
     }
   }

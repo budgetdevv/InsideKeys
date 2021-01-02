@@ -11,7 +11,10 @@ namespace InsideKeys
 
             private readonly Dictionary<char, int> CharToIndex;
 
-            private readonly ThreadLocal<Random> Rands;
+            //private readonly ThreadLocal<Random> Rands;
+            
+            [ThreadStatic]
+            private static Random LocalRand;
         
             public InsideKeyEngine()
             {
@@ -19,7 +22,7 @@ namespace InsideKeys
                 
                 //This is so that results wouldn't always be the same upon restart
                 
-                Rands = new ThreadLocal<Random>(() => new Random((int)DateTime.UtcNow.Ticks));
+                //Rands = new ThreadLocal<Random>(() => new Random((int)DateTime.UtcNow.Ticks));
 
                 for (int I = 0; I <= 9; I++)
                 {
@@ -27,14 +30,15 @@ namespace InsideKeys
                 }
             }
         
+            [SkipLocalsInit]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public unsafe string GenCode(TimeSpan LifeTime)
             {
-                //Memory is Zero-ed
+                //Memory is NOT Zero-ed
                 
                 var KeyNums = stackalloc int[13];
 
-                var KeyChars = stackalloc char[25];
+                var KeyChars = stackalloc char[24];
         
                 const char Dash = '-';
         
@@ -58,7 +62,7 @@ namespace InsideKeys
         
                 //Generate first 8 letters
 
-                var Rand = Rands.Value;
+                var Rand = GetRand();
                 
                 int Offset = 0;
                 
@@ -97,18 +101,25 @@ namespace InsideKeys
                 //Generate 8 chars based on Total; Total is guaranteed to be 8 digits
                 //E.x. 2001-11-21, and max value of offset is below 1k
 
-                SplitFast(Total, ref KeyNums, 8);
+                SplitFast(Total, KeyNums, 8);
 
                 //Generate remaining 5 digits based on Secs elapsed in the day
         
                 //Ranges anywhere from 0 to 86400 - 1
 
-                
                 //int TotalSeconds = (int)DateTime.UtcNow.TimeOfDay.TotalSeconds; //Me being retarded
-                
+
+                //Since we are using SkipLocalsInit, we should zero fill the first 4 digits of the
+                //last 5 digits!
+
+                for (int I = 9; I <= 13; I++)
+                {
+                    KeyNums[I] = 0;
+                }
+
                 int TotalSeconds = (int)ExpiryDate.TimeOfDay.TotalSeconds;
 
-                SplitFast(TotalSeconds, ref KeyNums, 13);
+                SplitFast(TotalSeconds, KeyNums, 13);
 
                 int AccessCount = 0;
 
@@ -126,9 +137,15 @@ namespace InsideKeys
                     AccessCount++;
                 }
 
+                // for (int I = 0; I <= 25; I++)
+                // {
+                //     Console.WriteLine($"{I} | {KeyChars[I]}");
+                // }
+
                 return new string(KeyChars);
             }
         
+            [SkipLocalsInit]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public unsafe DateTime Decode(string Key)
             {
@@ -181,7 +198,7 @@ namespace InsideKeys
                 
                 //We have to combine them to increment by offset
 
-                var Total = CombineFast(ref TimeInts, 0, 8);
+                var Total = CombineFast(TimeInts, 0, 8);
 
                 // //Increment Total by Offset to get YYYY/MM/DD
                 //
@@ -197,15 +214,15 @@ namespace InsideKeys
                 
                 //We have to split them up again
 
-                SplitFast(Total, ref TimeInts, 8);
+                SplitFast(Total, TimeInts, 8);
 
                 //Cache values of Year, Month and Day so we can reuse TimeInts array
 
-                int Year = CombineFast(ref TimeInts, 0, 4);
+                int Year = CombineFast(TimeInts, 0, 4);
 
-                int Month = CombineFast(ref TimeInts, 4, 2);
+                int Month = CombineFast(TimeInts, 4, 2);
 
-                int Day = CombineFast(ref TimeInts, 6, 2);
+                int Day = CombineFast(TimeInts, 6, 2);
 
                 //Construct total elapsed seconds
 
@@ -224,7 +241,7 @@ namespace InsideKeys
                 
                 //Now, construct Expiry DateTime
 
-                int Seconds = CombineFast(ref TimeInts, 0, 5);
+                int Seconds = CombineFast(TimeInts, 0, 5);
 
                 //Console.WriteLine(Seconds);
                 
@@ -234,7 +251,7 @@ namespace InsideKeys
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private static unsafe int SplitFast(int Num, ref int* Output, int ArrayLength)
+            private static unsafe int SplitFast(int Num, int* Output, int ArrayLength)
             {
                 int I = 1;
                 
@@ -258,7 +275,7 @@ namespace InsideKeys
             }
             
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private static unsafe int CombineFast(ref int* Input, int StartingIndex, int ArrayLength)
+            private static unsafe int CombineFast(int* Input, int StartingIndex, int ArrayLength)
             {
                 int F = 0;
 
@@ -293,8 +310,19 @@ namespace InsideKeys
                     
                     Num *= Num;
                 }
-
+            
                 return result;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private static Random GetRand()
+            {
+                if (LocalRand == default)
+                {
+                    LocalRand = new Random((int) DateTime.UtcNow.Ticks);
+                }
+
+                return LocalRand;
             }
         }
 }
