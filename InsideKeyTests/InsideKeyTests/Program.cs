@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.Intrinsics.Arm;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
 using CustomBot;
 using InsideKeys;
 
@@ -10,7 +15,9 @@ namespace InsideKeyTests
     {
         static void Main(string[] args)
         {
-            BenchmarkMultiThreaded();
+            BenchmarkRunner.Run<Bench>();
+
+            //BenchmarkMultiThreaded();
         }
 
         public static void FunctionalityTest()
@@ -47,6 +54,34 @@ namespace InsideKeyTests
             SW.Stop();
 
             Console.WriteLine(SW.ElapsedMilliseconds);
+        }
+    }
+    
+    [MemoryDiagnoser]
+    public class Bench
+    {
+        private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+
+        private Random Rand;
+
+        private InsideKeyEngine KE;
+
+        private TimeSpan TS;
+        
+        [GlobalSetup]
+        public void GlobalSetup()
+        {
+            Rand = new Random(1258);
+
+            KE = new InsideKeyEngine();
+
+            TS = TimeSpan.FromHours(12);
+        }
+
+        [Benchmark]
+        public void GenKey()
+        {
+            var Code = KE.GenCode(TS);
         }
     }
 }

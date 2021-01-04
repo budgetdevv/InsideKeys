@@ -9,14 +9,14 @@ namespace InsideKeys
         {
             private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
-            private readonly Dictionary<char, int> CharToIndex;
+            private static readonly Dictionary<char, int> CharToIndex;
 
             //private readonly ThreadLocal<Random> Rands;
             
             [ThreadStatic]
             private static Random LocalRand;
         
-            public InsideKeyEngine()
+            static InsideKeyEngine()
             {
                 CharToIndex = new Dictionary<char, int>();
                 
@@ -32,7 +32,7 @@ namespace InsideKeys
         
             [SkipLocalsInit]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public unsafe string GenCode(TimeSpan LifeTime)
+            public static unsafe string GenCode(TimeSpan LifeTime)
             {
                 //Memory is NOT Zero-ed
                 
@@ -147,7 +147,7 @@ namespace InsideKeys
         
             [SkipLocalsInit]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public unsafe DateTime Decode(string Key)
+            public unsafe static DateTime Decode(string Key)
             {
                 //Random----Time------Seconds
                 
@@ -251,7 +251,7 @@ namespace InsideKeys
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private static unsafe int SplitFast(int Num, int* Output, int ArrayLength)
+            private unsafe static int SplitFast(int Num, int* Output, int ArrayLength)
             {
                 int I = 1;
                 
