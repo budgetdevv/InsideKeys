@@ -19,10 +19,6 @@ namespace InsideKeys
             static InsideKeyEngine()
             {
                 CharToIndex = new Dictionary<char, int>();
-                
-                //This is so that results wouldn't always be the same upon restart
-                
-                //Rands = new ThreadLocal<Random>(() => new Random((int)DateTime.UtcNow.Ticks));
 
                 for (int I = 0; I <= 9; I++)
                 {
@@ -86,14 +82,6 @@ namespace InsideKeys
                     Offset += NewChar;
                 }
 
-                // //Offset MM/DD
-                //
-                // Total -= Offset;
-                //
-                // //Offset YYYY
-                //
-                // Total -= Offset * 1000;
-                
                 //Offset YYYY/MM/DD
                 
                 Total -= Offset * 1001;
@@ -103,11 +91,7 @@ namespace InsideKeys
 
                 SplitFast(Total, KeyNums, 8);
 
-                //Generate remaining 5 digits based on Secs elapsed in the day
-        
-                //Ranges anywhere from 0 to 86400 - 1
-
-                //int TotalSeconds = (int)DateTime.UtcNow.TimeOfDay.TotalSeconds; //Me being retarded
+                //Generate remaining 5 digits based on Secs elapsed in the day ( Ranging anywhere from 0 to 86400 - 1 )
 
                 //Since we are using SkipLocalsInit, we should zero fill the first 4 digits of the
                 //last 5 digits!
@@ -147,7 +131,7 @@ namespace InsideKeys
         
             [SkipLocalsInit]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public unsafe static DateTime Decode(string Key)
+            public static unsafe DateTime Decode(string Key)
             {
                 //Random----Time------Seconds
                 
@@ -251,7 +235,7 @@ namespace InsideKeys
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private unsafe static int SplitFast(int Num, int* Output, int ArrayLength)
+            private static unsafe int SplitFast(int Num, int* Output, int ArrayLength)
             {
                 int I = 1;
                 
@@ -317,12 +301,9 @@ namespace InsideKeys
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private static Random GetRand()
             {
-                if (LocalRand == default)
-                {
-                    LocalRand = new Random((int) DateTime.UtcNow.Ticks);
-                }
-
-                return LocalRand;
+                //This is so that results wouldn't always be the same upon restart
+                
+                return LocalRand ??= new Random((int)DateTime.UtcNow.Ticks);
             }
         }
 }
